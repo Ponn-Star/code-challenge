@@ -1,0 +1,19 @@
+// Cách 1: Sử dụng công thức toán học Gauss
+var sum_to_n_a = function(n) {
+    return (n * (n + 1)) / 2; // Công thức tổng 1+2+...+n
+};
+
+// Cách 2: Sử dụng vòng lặp for
+var sum_to_n_b = function(n) {
+    let sum = 0;
+    for (let i = 1; i <= n; i++) {
+        sum += i;
+    }
+    return sum;
+};
+
+// Cách 3: Sử dụng đệ quy đuôi
+var sum_to_n_e = function(n, acc = 0) {
+    if (n === 0) return acc; // Điều kiện dừng
+    return sum_to_n_e(n - 1, acc + n); // Tích lũy giá trị
+};

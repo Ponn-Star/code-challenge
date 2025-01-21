@@ -1,0 +1,22 @@
+{
+    "sourceFile": "Messy.ts",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1737430579871,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1737430614343,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -64,5 +64,27 @@\n     });\r\n   \r\n     return <div {...rest}>{rows}</div>;\r\n   };\r\n-  \n\\ No newline at end of file\n+\r\n+  /*\r\n+  -- Chi tiết sửa lỗi --\r\n+Khai báo blockchain trong WalletBalance:\r\n+\r\n+Thêm blockchain: string để hàm getPriority hoạt động chính xác.\r\n+Sửa logic trong filter:\r\n+\r\n+Lọc các balances có thứ tự ưu tiên hợp lệ (> -99) và số dư dương (> 0).\r\n+Loại bỏ dependency không cần thiết trong useMemo:\r\n+\r\n+Xóa prices khỏi useMemo của sortedBalances.\r\n+Thêm useMemo cho formattedBalances:\r\n+\r\n+Bọc logic định dạng vào useMemo để tránh tính toán lại không cần thiết.\r\n+Sửa key khi render danh sách:\r\n+\r\n+Thay key={index} bằng key={balance.currency} để đảm bảo tính duy nhất.\r\n+Tối ưu hóa hàm getPriority:\r\n+\r\n+Dùng object priorities để tra cứu giá trị thay vì sử dụng switch.\r\n+\r\n+*/\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1737430579871,
+            "name": "Commit-0",
+            "content": "interface WalletBalance {\r\n    currency: string;\r\n    blockchain: string;\r\n    amount: number;\r\n  }\r\n  \r\n  interface FormattedWalletBalance extends WalletBalance {\r\n    formatted: string;\r\n  }\r\n  \r\n  interface Props extends BoxProps {}\r\n  \r\n  const WalletPage: React.FC<Props> = (props: Props) => {\r\n    const { children, ...rest } = props;\r\n    const balances = useWalletBalances();\r\n    const prices = usePrices();\r\n  \r\n    // Hàm tính thứ tự ưu tiên\r\n    const getPriority = (blockchain: string): number => {\r\n      const priorities: { [key: string]: number } = {\r\n        Osmosis: 100,\r\n        Ethereum: 50,\r\n        Arbitrum: 30,\r\n        Zilliqa: 20,\r\n        Neo: 20,\r\n      };\r\n      return priorities[blockchain] || -99;\r\n    };\r\n  \r\n    // Lọc và sắp xếp balances\r\n    const sortedBalances = useMemo(() => {\r\n      return balances\r\n        .filter((balance) => {\r\n          const priority = getPriority(balance.blockchain);\r\n          return priority > -99 && balance.amount > 0;\r\n        })\r\n        .sort((lhs, rhs) => {\r\n          const leftPriority = getPriority(lhs.blockchain);\r\n          const rightPriority = getPriority(rhs.blockchain);\r\n          return rightPriority - leftPriority;\r\n        });\r\n    }, [balances]);\r\n  \r\n    // Định dạng balances\r\n    const formattedBalances = useMemo(() => {\r\n      return sortedBalances.map((balance) => ({\r\n        ...balance,\r\n        formatted: balance.amount.toFixed(),\r\n      }));\r\n    }, [sortedBalances]);\r\n  \r\n    // Render danh sách hàng (rows)\r\n    const rows = formattedBalances.map((balance) => {\r\n      const usdValue = prices[balance.currency] * balance.amount;\r\n      return (\r\n        <WalletRow\r\n          className={classes.row}\r\n          key={balance.currency} // Sử dụng currency làm key\r\n          amount={balance.amount}\r\n          usdValue={usdValue}\r\n          formattedAmount={balance.formatted}\r\n        />\r\n      );\r\n    });\r\n  \r\n    return <div {...rest}>{rows}</div>;\r\n  };\r\n  "
+        }
+    ]
+}
